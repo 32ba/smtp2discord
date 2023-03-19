@@ -6,21 +6,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/mail"
 	"os"
-
-	"github.com/alash3al/go-smtpsrv/v3"
 )
 
-func Handler(c *smtpsrv.Context) error {
-	log.Printf("Info: Received message from %s", c.RemoteAddr().String())
+func handler(msg *mail.Message) error {
 	webhookUrl := os.Getenv("WEBHOOK_URL")
 
-	msg, err := c.Parse()
+	parsedMsg, err := parseEmail(msg)
 	if err != nil {
 		return handleError(fmt.Errorf("failed to parse message: %v", err))
 	}
 
-	webhookMessage := messageBuilder(msg)
+	webhookMessage, err := messageBuilder(parsedMsg)
+	if err != nil {
+		return handleError(fmt.Errorf("failed to build message: %v", err))
+	}
 
 	json, err := json.Marshal(webhookMessage)
 	if err != nil {
@@ -37,9 +38,9 @@ func Handler(c *smtpsrv.Context) error {
 	return nil
 }
 
-func messageBuilder(msg *smtpsrv.Email) *DiscordWebhook {
+func messageBuilder(msg *Email) (*DiscordWebhook, error) {
 	var toStr string = ""
-	for _, s := range msg.To {
+	for _, s := range *msg.To {
 		if s.Name != "" {
 			toStr += fmt.Sprintf(" %s <%s>", s.Name, s.Address)
 		} else {
@@ -48,7 +49,7 @@ func messageBuilder(msg *smtpsrv.Email) *DiscordWebhook {
 	}
 
 	var fromStr string = ""
-	for _, s := range msg.From {
+	for _, s := range *msg.From {
 		if s.Name != "" {
 			fromStr += fmt.Sprintf(" %s <%s>", s.Name, s.Address)
 		} else {
@@ -60,8 +61,8 @@ func messageBuilder(msg *smtpsrv.Email) *DiscordWebhook {
 		Content: fmt.Sprintf("New email received from: %s", fromStr),
 		Embeds: DiscordEmbed{
 			{
-				Title:       fmt.Sprintf("Subject: %s", msg.Subject),
-				Description: fmt.Sprintf("```%s```", msg.TextBody),
+				Title:       fmt.Sprintf("Subject: %s", *msg.Subject),
+				Description: fmt.Sprintf("```%s```", *msg.Body),
 				Color:       0x00ff00,
 				Author: DiscordEmbedAuthor{
 					Name:   "Email",
@@ -85,7 +86,7 @@ func messageBuilder(msg *smtpsrv.Email) *DiscordWebhook {
 				},
 			},
 		},
-	}
+	}, nil
 }
 
 func send(json []byte, url string) (resp *http.Response, err error) {
