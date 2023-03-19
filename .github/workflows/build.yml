@@ -22,7 +22,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ${{ github.repository }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -40,6 +40,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ github.sha }}, ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ github.sha }}, ghcr.io/${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
