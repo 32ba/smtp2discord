@@ -5,7 +5,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ master ]
-
+    
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -18,11 +18,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Get Docker metadata
+      - uses: actions-ecosystem/action-get-latest-tag@v1
         id: meta
-        uses: docker/metadata-action@v4
         with:
-          images: ${{ github.repository }}
+          # Only use tags that match the specified regex pattern
+          # Default: .*
+          tag_regex: '^v\d+\.\d+\.\d+$'
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -40,6 +41,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ github.sha }}, ghcr.io/${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/${{ github.repository }}:latest, ghcr.io/${{ github.repository }}:${{ github.sha }}, ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
