@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"github.com/alash3al/go-smtpsrv/v3"
+	"github.com/emersion/go-smtp"
 )
 
 func main() {
@@ -18,19 +17,18 @@ func main() {
 		log.Fatal("Error: WEBHOOK_URL is not set")
 	}
 
-	cfg := smtpsrv.ServerConfig{
-		BannerDomain:    "localhost",
-		ListenAddr:      fmt.Sprintf(":%s", port),
-		MaxMessageBytes: 1024 * 1024 * 10,
-		ReadTimeout:     time.Duration(10) * time.Second,
-		WriteTimeout:    time.Duration(10) * time.Second,
-		Handler:         Handler,
-	}
-
-	log.Printf("Info: Starting SMTP server on port %s", port)
-
-	err := smtpsrv.ListenAndServe(&cfg)
-	if err != nil {
-		log.Fatalf("Error: Failed to start SMTP server: %v", err)
+	be := &backend{}
+	s := smtp.NewServer(be)
+	s.Addr = ":" + port
+	s.Domain = "localhost"
+	s.ReadTimeout = 10 * time.Minute
+	s.WriteTimeout = 10 * time.Minute
+	s.MaxMessageBytes = 1024 * 1024
+	s.MaxRecipients = 50
+	s.AllowInsecureAuth = true
+	
+	log.Printf("Info: Starting server on port %s", port)
+	if err := s.ListenAndServe(); err != nil {
+		log.Fatal(err)
 	}
 }
