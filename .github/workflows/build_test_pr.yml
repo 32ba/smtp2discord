@@ -1,0 +1,29 @@
+name: Build and test when PR to master
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.16'
+          cache: true
+          cache-dependency-path: go.mod
+
+      - name: Go lint
+        uses: golangci/golangci-lint-action@v3
+
+      - name: Go build
+        run: go build -v ./...
+
+      - name: Go test
+        run: go test -v ./...
+
