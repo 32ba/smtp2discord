@@ -2,6 +2,14 @@
 
 This is a simple SMTP server that forwards emails to a Discord channel using a webhook.
 
+![](./assets/01.jpg)
+
+## Features
+
+- [x] Forward emails to a Discord channel
+- [x] Support encoded email subjects
+- [x] Support encoded email body
+
 ## Usage
 
 You should set the following environment variables:

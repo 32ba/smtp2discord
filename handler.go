@@ -40,7 +40,7 @@ func handler(msg *mail.Message) error {
 
 func messageBuilder(msg *Email) (*DiscordWebhook, error) {
 	var toStr string = ""
-	for _, s := range *msg.To {
+	for _, s := range msg.To {
 		if s.Name != "" {
 			toStr += fmt.Sprintf(" %s <%s>", s.Name, s.Address)
 		} else {
@@ -49,7 +49,7 @@ func messageBuilder(msg *Email) (*DiscordWebhook, error) {
 	}
 
 	var fromStr string = ""
-	for _, s := range *msg.From {
+	for _, s := range msg.From {
 		if s.Name != "" {
 			fromStr += fmt.Sprintf(" %s <%s>", s.Name, s.Address)
 		} else {
@@ -61,11 +61,11 @@ func messageBuilder(msg *Email) (*DiscordWebhook, error) {
 		Content: fmt.Sprintf("New email received from: %s", fromStr),
 		Embeds: DiscordEmbed{
 			{
-				Title:       fmt.Sprintf("Subject: %s", *msg.Subject),
-				Description: fmt.Sprintf("```%s```", *msg.Body),
+				Title:       fmt.Sprintf("Subject: %s", msg.Subject),
+				Description: fmt.Sprintf("```%s```", msg.Body),
 				Color:       0x00ff00,
 				Author: DiscordEmbedAuthor{
-					Name:   "Email",
+					Name: "Email",
 				},
 				Fields: []DiscordEmbedField{
 					{
