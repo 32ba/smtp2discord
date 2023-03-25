@@ -1,9 +1,9 @@
 package main
 
 type DiscordWebhook struct {
-	Username string      `json:"username,omitempty"`
-	Avatar   string      `json:"avatar_url,omitempty"`
-	Content  string      `json:"content,omitempty"`
+	Username string       `json:"username,omitempty"`
+	Avatar   string       `json:"avatar_url,omitempty"`
+	Content  string       `json:"content,omitempty"`
 	Embeds   DiscordEmbed `json:"embeds,omitempty"`
 }
 

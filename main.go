@@ -26,7 +26,7 @@ func main() {
 	s.MaxMessageBytes = 1024 * 1024
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
-	
+
 	log.Printf("Info: Starting server on port %s", port)
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
