@@ -3,6 +3,7 @@ name: Build and test when PR to master
 on:
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
